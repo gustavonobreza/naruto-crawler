@@ -12,12 +12,9 @@ const (
 	ARTICLES_TO_TAKE = 7
 )
 
-var (
-	atricles []string
-)
-
 // Fetch return (body, nil) if sucessful, and (nil, error) if not.
 func Fetch(url string) ([]string, error) {
+	var atricles []string
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -34,19 +31,23 @@ func Fetch(url string) ([]string, error) {
 		return len(t) >= 5
 	})
 
-	i := 0
+	rawTxt := rawArticles.Text()
 
-	rawArticles.Each(func(_ int, s *goquery.Selection) {
-		if i < 5 {
-			txt := s.Text()
+	splitted := strings.Split(rawTxt, ".")
+
+	for i, v := range splitted {
+
+		isSmall := len(strings.Join(atricles, "")) < 2500
+
+		if i < ARTICLES_TO_TAKE || isSmall {
+			txt := v
 			txt = strings.TrimSpace(txt)
 			re := regexp.MustCompile(`(\[)+\d+(\])`)
-			txtClean1 := re.ReplaceAllString(txt, "")
+			txtClean1 := re.ReplaceAllString(txt, "") + "."
 
 			atricles = append(atricles, txtClean1)
 		}
-		i++
-	})
+	}
 
 	return atricles, nil
 

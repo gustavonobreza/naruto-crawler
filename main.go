@@ -21,7 +21,7 @@ func main() {
 		"Hinata Hyuga",
 		"Neji Hyuga",
 		"Jiraiya",
-		"Tsunade Senju", "Tsunade",
+		"Tsunade",
 		"Orochimaru",
 		"Nagato",
 		"Sarada Uchiha",
@@ -118,9 +118,7 @@ func main() {
 
 		for _, v := range res {
 			str += v
-			str += "\n"
 		}
-		str += "\n\n"
 		ioutil.WriteFile(name+".txt", []byte(str), fs.ModeAppend)
 	}
 
