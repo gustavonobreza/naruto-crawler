@@ -109,9 +109,10 @@ func main() {
 
 	println("Starting...")
 
+	urlBase := "https://naruto.fandom.com/wiki/"
+
 	for _, name := range characters {
 		name = strings.ReplaceAll(name, " ", "_")
-		urlBase := "https://naruto.fandom.com/wiki/"
 		url := urlBase + name
 
 		go Fetch(url, name, paragraph)
