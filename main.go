@@ -107,6 +107,8 @@ func main() {
 		"Gamabunta"}
 	paragraph := make(chan []string)
 
+	println("Starting...")
+
 	for _, name := range characters {
 		name = strings.ReplaceAll(name, " ", "_")
 		urlBase := "https://naruto.fandom.com/wiki/"
@@ -116,7 +118,12 @@ func main() {
 	}
 
 	for i := 0; true; i++ {
-		results := <-paragraph
-		println(i, results[0])
+		if i == len(characters) {
+			println("Finished!")
+			return
+		}
+		// results := <-paragraph
+		// println(i, "-", results[0])
+		<-paragraph
 	}
 }
