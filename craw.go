@@ -13,12 +13,12 @@ const (
 )
 
 // Fetch return (body, nil) if sucessful, and (nil, error) if not.
-func Fetch(url string) ([]string, error) {
+func Fetch(url, name string, txtSlince chan []string) {
 	var atricles []string
 	resp, err := http.Get(url)
 
 	if err != nil {
-		return []string{}, err
+		return
 	}
 
 	defer resp.Body.Close()
@@ -49,6 +49,12 @@ func Fetch(url string) ([]string, error) {
 		}
 	}
 
-	return atricles, nil
+	txtSlince <- atricles
+	// var str string
+
+	// for _, v := range atricles {
+	// 	str += v
+	// }
+	// ioutil.WriteFile(name+".txt", []byte(str), fs.ModeAppend)
 
 }

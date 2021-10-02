@@ -1,8 +1,6 @@
 package main
 
 import (
-	"io/fs"
-	"io/ioutil"
 	"strings"
 )
 
@@ -107,19 +105,18 @@ func main() {
 		"Ishikawa",
 		"Gamakichi",
 		"Gamabunta"}
+	paragraph := make(chan []string)
 
 	for _, name := range characters {
 		name = strings.ReplaceAll(name, " ", "_")
 		urlBase := "https://naruto.fandom.com/wiki/"
 		url := urlBase + name
 
-		res, _ := Fetch(url)
-		var str string
-
-		for _, v := range res {
-			str += v
-		}
-		ioutil.WriteFile(name+".txt", []byte(str), fs.ModeAppend)
+		go Fetch(url, name, paragraph)
 	}
 
+	for i := 0; true; i++ {
+		results := <-paragraph
+		println(i, results[0])
+	}
 }
