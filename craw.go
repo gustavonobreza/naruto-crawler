@@ -16,45 +16,64 @@ const (
 func Fetch(url, name string, txtSlince chan []string) {
 	var atricles []string
 	resp, err := http.Get(url)
-
 	if err != nil {
+		println("[ERROR]: Fail to fetch data from:", url)
 		return
 	}
-
 	defer resp.Body.Close()
 
-	doc, _ := goquery.NewDocumentFromReader(resp.Body)
-
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		println("[ERROR]: Fail to fetch data from:", url)
+		return
+	}
+	// Articles
 	rawArticles := doc.Find("#mw-content-text > div > p").FilterFunction(func(i int, s *goquery.Selection) bool {
 		t := s.Text()
 		// Removing junk data
-		return len(t) >= 5
+		return len(t) >= 10
 	})
 
-	rawTxt := rawArticles.Text()
+	rawTxtArticles := rawArticles.Text()
 
-	splitted := strings.Split(rawTxt, ".")
+	// The page not respond with 404, so if not has "." the url fail
+	if !strings.Contains(rawTxtArticles, ".") {
+		println("[ERROR]: Fail to fetch data from:", url)
+		return
+	}
+
+	// Removing junks
+	rawTxtArticles = strings.ReplaceAll(rawTxtArticles, "\t", "")
+	rawTxtArticles = strings.ReplaceAll(rawTxtArticles, "\r", "")
+
+	// by '\n'
+	splitted := strings.Split(rawTxtArticles, "\n")
+	// by '.'
+	// splitted := strings.Split(rawTxtArticles, ".")
+
+	// Check if page not exists
+	if strings.Contains(splitted[0], "There is currently no text in this page") {
+		println("[ERROR]: Fail to fetch data from:", url)
+		return
+	}
 
 	for i, v := range splitted {
-
 		isSmall := len(strings.Join(atricles, "")) < 2500
-
 		if i < ARTICLES_TO_TAKE || isSmall {
 			txt := v
 			txt = strings.TrimSpace(txt)
+
+			// Removing junk as [23] or [7], I don't know what is it
 			re := regexp.MustCompile(`(\[)+\d+(\])`)
 			txtClean1 := re.ReplaceAllString(txt, "") + "."
-
 			atricles = append(atricles, txtClean1)
 		}
 	}
 
+	// println("SIZE OF", name, "->", len(atricles))
+	// println("FIRST OF", name, "HAS", "->", len(atricles[0]))
+	// println("TOTAL OF", name, "HAS", "->", len(strings.Join(atricles, "")))
+	// println("--------------------------------------------")
+	// print("\n")
 	txtSlince <- atricles
-	// var str string
-
-	// for _, v := range atricles {
-	// 	str += v
-	// }
-	// ioutil.WriteFile(name+".txt", []byte(str), fs.ModeAppend)
-
 }
