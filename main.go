@@ -14,7 +14,7 @@ func main() {
 	println("Starting...")
 
 	urlBase := "https://naruto.fandom.com/wiki/"
-	println("Characters client count:", len(characters))
+	println("Characters count:", len(characters))
 
 	for _, name := range characters {
 		url := urlBase + name
