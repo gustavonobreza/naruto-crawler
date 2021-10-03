@@ -12,19 +12,25 @@ const (
 	ARTICLES_TO_TAKE = 7
 )
 
+func failFetch(target string) string {
+	str := "[ERROR]: Fail to fetch data from: " + target
+	println(str)
+	return str
+}
+
 // Fetch return (body, nil) if sucessful, and (nil, error) if not.
 func Fetch(url, name string, txtSlince chan []string) {
 	var atricles []string
 	resp, err := http.Get(url)
 	if err != nil {
-		println("[ERROR]: Fail to fetch data from:", url)
+		failFetch(url)
 		return
 	}
 	defer resp.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		println("[ERROR]: Fail to fetch data from:", url)
+		failFetch(url)
 		return
 	}
 	// Articles
@@ -38,13 +44,14 @@ func Fetch(url, name string, txtSlince chan []string) {
 
 	// The page not respond with 404, so if not has "." the url fail
 	if !strings.Contains(rawTxtArticles, ".") {
-		println("[ERROR]: Fail to fetch data from:", url)
+		failFetch(url)
 		return
 	}
 
 	// Removing junks
 	rawTxtArticles = strings.ReplaceAll(rawTxtArticles, "\t", "")
 	rawTxtArticles = strings.ReplaceAll(rawTxtArticles, "\r", "")
+	rawTxtArticles = strings.ReplaceAll(rawTxtArticles, "  ", "")
 
 	// by '\n'
 	splitted := strings.Split(rawTxtArticles, "\n")
@@ -53,7 +60,7 @@ func Fetch(url, name string, txtSlince chan []string) {
 
 	// Check if page not exists
 	if strings.Contains(splitted[0], "There is currently no text in this page") {
-		println("[ERROR]: Fail to fetch data from:", url)
+		failFetch(url)
 		return
 	}
 
