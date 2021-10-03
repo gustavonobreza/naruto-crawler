@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	characters := parseData()
+	characters := parseFileData()
 	paragraph := make(chan []string)
 
 	println("Starting...")
@@ -32,7 +32,7 @@ func main() {
 	}
 }
 
-func parseData() []string {
+func parseFileData() []string {
 	file, err := os.Open("characters.txt")
 	if err != nil {
 		fmt.Println(err)
