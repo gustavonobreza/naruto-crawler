@@ -18,7 +18,6 @@ func failFetch(target string) string {
 	return str
 }
 
-// Fetch return (body, nil) if sucessful, and (nil, error) if not.
 func Fetch(url, name string, txtSlince chan []string) {
 	var atricles []string
 	resp, err := http.Get(url)
